@@ -1,0 +1,29 @@
+?import serial
+import time
+import http.client
+import json
+conn = http.client.HTTPSConnection('api.thingspeak.com', 443)
+ser = serial.Serial('/dev/ttyUSB0',9600)
+s = [0,1]
+while True:
+	read_serial=ser.readline()
+	s[0] = str((ser.readline(),16))
+	m=read_serial
+	print s[0]
+	print read_serial
+	print m
+	e=m
+	m=str(e)
+	m=m[:-2]
+	q='/update?api_key=PZZLMWWH79NOQ4MS&field1='+m
+	print q
+	conn.request('GET', q)
+	r = conn.getresponse()
+	rbytes=r.read().decode('utf-8')
+	conn.request('GET', '/channels/279404/fields/2/last.json')
+	r = conn.getresponse()
+	rbytes=r.read().decode('utf-8')
+	rjson=json.loads(rbytes)
+	sa=rjson['field2']
+	print sa
+	ser.write(sa)
